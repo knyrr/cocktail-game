@@ -7,13 +7,20 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.ridango.game.entity.Score;
+import com.ridango.game.service.ScoreService;
+
 @SpringBootApplication
 public class CocktailGameApplication implements CommandLineRunner {
-	CocktailApiClient service = new CocktailApiClient();
+	CocktailApiClient drinkClient = new CocktailApiClient();
+
+	@Autowired
+	private ScoreService scoreService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CocktailGameApplication.class, args);
@@ -79,6 +86,11 @@ public class CocktailGameApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		Scanner scanner = new Scanner(System.in).useDelimiter("\\n");
 
+		scoreService.saveScore(new Score("Alice", 90));
+		scoreService.saveScore(new Score("Mai", 110));
+		List<Score> allScores = scoreService.getAllScores();
+		Score highestScore = scoreService.getHighestScore();
+
 		Drink drink;
 		String name;
 		List<Character> uniqueCharsInName;
@@ -89,103 +101,120 @@ public class CocktailGameApplication implements CommandLineRunner {
 
 		int score = 0;
 		int round;
+		Boolean continueGameSession;
 		Boolean continueGame = true;
 
-		System.out.println();
-		System.out.println("*****************************************");
-		System.out.println("*Welcome to the game Guess the Cocktail!*");
-		System.out.println("*****************************************");
-		System.out.println();
+		System.out.println(allScores.toString());
+		System.out.println(highestScore.getScore());
 
-		System.out.println("Please enter your name");
-		String player = scanner.next();
-
-		System.out.println();
-		System.out.print("Hi, " + player + "!");
-		System.out.println();
-
+		// Game
 		while (continueGame) {
-			drink = service.fetchRandomCocktail();
-			name = drink.getName();
-			uniqueCharsInName = extractUniqueCharacters(name);
-			visibleCharacters = new ArrayList<Character>();
-			visibleCharacters.add(' ');
-			tokenisedName = tokeniseName(name);
-			charactersToReveal = uniqueCharsInName.size() / 5;
+			continueGameSession = true;
 
-			round = 5;
+			System.out.println();
+			System.out.println("*****************************************");
+			System.out.println("*Welcome to the game Guess the Cocktail!*");
+			System.out.println("*****************************************");
+			System.out.println("Best barista in the game: " + highestScore.getName() + " / "
+					+ highestScore.getScore());
+			System.out.println();
 
-			gameLoop: for (int i = 0; i < round; i++) {
-				for (int j = 0; j < charactersToReveal; j++) {
-					Character randomUniqueCharacterInName = pickRandomCharacter(uniqueCharsInName);
-					if (i != 0 && randomUniqueCharacterInName != null
-							&& randomUniqueCharacterInName != Character.valueOf('\0')) {
-						uniqueCharsInName.remove(Character.valueOf(randomUniqueCharacterInName));
-						visibleCharacters.add(randomUniqueCharacterInName);
+			System.out.println("Please enter your name");
+			String player = scanner.next();
+
+			System.out.println();
+			System.out.print("Hi, " + player + "!");
+			System.out.println();
+
+			// Game session
+			while (continueGameSession) {
+				drink = drinkClient.fetchRandomCocktail();
+				name = drink.getName();
+				uniqueCharsInName = extractUniqueCharacters(name);
+				visibleCharacters = new ArrayList<Character>();
+				visibleCharacters.add(' ');
+				tokenisedName = tokeniseName(name);
+				charactersToReveal = uniqueCharsInName.size() / 5;
+
+				round = 5;
+
+				// Game round
+				gameRound: for (int i = 0; i < round; i++) {
+					for (int j = 0; j < charactersToReveal; j++) {
+						Character randomUniqueCharacterInName = pickRandomCharacter(uniqueCharsInName);
+						if (i != 0 && randomUniqueCharacterInName != null
+								&& randomUniqueCharacterInName != Character.valueOf('\0')) {
+							uniqueCharsInName.remove(Character.valueOf(randomUniqueCharacterInName));
+							visibleCharacters.add(randomUniqueCharacterInName);
+						}
+					}
+
+					tokenisedName = checkTokenVisibilty(tokenisedName, visibleCharacters);
+					coveredName = convertTokenisedNameToString(tokenisedName);
+
+					System.out.println("\nGuess the Cocktail. Attempts left " + (round - i) + ". Score " + score);
+					System.out.println("Name: " + coveredName + "\n");
+					System.out.println("Spoiler: " + name + "\n");
+
+					System.out.println("Hint " + (i + 1));
+					switch (i) {
+						case 0:
+							System.out.println("Instructions: " + drink.getInstructions());
+							break;
+						case 1:
+							System.out.println("Category: " + drink.getCategory());
+							break;
+						case 2:
+							System.out.println("Glass: " + drink.getGlass());
+							break;
+						case 3:
+							System.out.println("Ingredients: " + drink.getIngredients().toString());
+							break;
+						case 4:
+							System.out.println("Image: " + drink.getImage());
+							break;
+						default:
+							break;
+					}
+
+					System.out.println();
+					System.out.println("Menu: 1 - guess the drink; 2 - skip to see a hint; 3 - exit");
+					int menuChoice = scanner.nextInt();
+
+					switch (menuChoice) {
+						case 1:
+							System.out.println("Enter your guess");
+							String guess = scanner.next().trim();
+							if (guess.equals(name)) {
+								score += round - i;
+								System.out.println(
+										"\nSuccess! You got " + (round - i) + " points and your total score is "
+												+ score + " points\n");
+								System.out.println("Do you want continue? y/n \n");
+								char c = scanner.next().charAt(0);
+								if (c == 'n') {
+									continueGameSession = false;
+								}
+								break gameRound;
+							} else {
+								System.out.println("Oh no! On to next round");
+								System.out.println();
+							}
+							break;
+						case 3:
+							continueGameSession = false;
+							break gameRound;
+						default:
+							break;
 					}
 				}
-
-				tokenisedName = checkTokenVisibilty(tokenisedName, visibleCharacters);
-				coveredName = convertTokenisedNameToString(tokenisedName);
-
-				System.out.println("\nGuess the Cocktail. Attempts left " + (round - i) + ". Score " + score);
-				System.out.println("Name: " + coveredName + "\n");
-				System.out.println("Spoiler: " + name + "\n");
-
-				System.out.println("Hint " + (i + 1));
-				switch (i) {
-					case 0:
-						System.out.println("Instructions: " + drink.getInstructions());
-						break;
-					case 1:
-						System.out.println("Category: " + drink.getCategory());
-						break;
-					case 2:
-						System.out.println("Glass: " + drink.getGlass());
-						break;
-					case 3:
-						System.out.println("Ingredients: " + drink.getIngredients().toString());
-						break;
-					case 4:
-						System.out.println("Image: " + drink.getImage());
-						break;
-					default:
-						break;
-				}
-
-				System.out.println();
-				System.out.println("Menu: 1 - guess the drink; 2 - skip to see a hint; 3 - exit");
-				int menuChoice = scanner.nextInt();
-
-				switch (menuChoice) {
-					case 1:
-						System.out.println("Enter your guess");
-						String guess = scanner.next().trim();
-						if (guess.equals(name)) {
-							score += round - i;
-							System.out.println("\nSuccess! You got " + (round - i) + " points and your total score is "
-									+ score + " points\n");
-							System.out.println("Do you want continue? y/n \n");
-							char c = scanner.next().charAt(0);
-							if (c == 'n') {
-								continueGame = false;
-							}
-							break gameLoop;
-						} else {
-							System.out.println("Oh no! On to next round");
-							System.out.println();
-						}
-						break;
-					case 3:
-						continueGame = false;
-						break gameLoop;
-					default:
-						break;
-				}
 			}
+			System.out.println("\nGame over!");
+			System.out.println("\nYour total score is: " + score);
+			scoreService.saveScore(new Score(player, score));
+
 		}
-		System.out.println("\nGame over!");
-		System.out.println("\nYour total score is: " + score);
+
 		scanner.close();
 
 	}
