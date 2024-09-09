@@ -12,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -51,9 +52,7 @@ public class GameController implements CommandLineRunner {
                 String name = drink.getName();
                 List<CharacterToken> tokenisedName = TokenUtils.tokeniseName(name);
                 List<Character> uniqueCharsInName = TokenUtils.extractUniqueCharacters(name);
-                List<Character> visibleCharacters = new ArrayList<>();
-                visibleCharacters.add(' ');
-                visibleCharacters.add('\'');
+                List<Character> visibleCharacters = new ArrayList<>(List.of(' ', '\'', '-', '#', '&'));
                 int charactersToReveal = uniqueCharsInName.size() / 5;
                 int attempts = 5;
 
@@ -71,8 +70,10 @@ public class GameController implements CommandLineRunner {
                     tokenisedName = TokenUtils.checkTokenVisibility(tokenisedName, visibleCharacters);
                     String coveredName = TokenUtils.convertTokenisedNameToString(tokenisedName);
 
-                    System.out.println("\nGuess the Cocktail. " + (attempts - i) +
-                            " attempts left. Score " + score);
+                    System.out.println("\nGuess the Cocktail. "
+                            + (attempts - i)
+                            + ((attempts - i) == 1 ? " attempt" : " attempts")
+                            + " left. Score " + score);
                     System.out.println("Name: " + coveredName);
                     System.out.println("Spoiler: " + name);
 
@@ -98,7 +99,14 @@ public class GameController implements CommandLineRunner {
                     }
 
                     System.out.println("\nMenu: 1 - guess the drink; 2 - skip to see a hint; 3 - exit");
-                    int menuChoice = scanner.nextInt();
+                    int menuChoice = scanner.next().charAt(0) - '0';
+                    List<Integer> validChoices = Arrays.asList(1, 2, 3);
+
+                    while (!validChoices.contains(menuChoice)) {
+                        System.out.println("Enter 1-2-3");
+                        System.out.println("Menu: 1 - guess the drink; 2 - skip to see a hint; 3 - exit");
+                        menuChoice = scanner.next().charAt(0) - '0';
+                    }
 
                     boolean breakRound = false;
 
@@ -109,7 +117,11 @@ public class GameController implements CommandLineRunner {
                             if (guess.equalsIgnoreCase(name)) {
                                 score += (attempts - i);
                                 System.out.println(
-                                        "\nSuccess! You got " + (attempts - i) + " points. Total score: " + score);
+                                        "\nSuccess! You got "
+                                                + (attempts - i)
+                                                + ((attempts - i) == 1 ? " point"
+                                                        : " points")
+                                                + ". Total score: " + score);
                                 System.out.println("Do you want to continue? y/n");
                                 char c = scanner.next().charAt(0);
                                 if (c == 'n') {
@@ -117,7 +129,12 @@ public class GameController implements CommandLineRunner {
                                 }
                                 breakRound = true;
                             } else {
-                                System.out.println("Oh no! On to next round");
+                                System.out.println("Oh no, wrong answer! On to next round");
+                            }
+                            break;
+                        case 2:
+                            if (i == 4) {
+                                continueGameSession = false;
                             }
                             break;
                         case 3:
@@ -132,8 +149,12 @@ public class GameController implements CommandLineRunner {
                     }
                 }
             }
-            System.out.println("\nGame over! Your total score is " + score);
-            scoreService.saveScore(new Score(player, score));
+            if (highestScore == null || score > highestScore.getScore()) {
+                System.out.println("\nYou are the ultimate barista. " + score + " is the best score in town!");
+                scoreService.saveScore(new Score(player, score));
+            } else {
+                System.out.println("\nGame over! Your total score is " + score);
+            }
         }
         scanner.close();
     }
