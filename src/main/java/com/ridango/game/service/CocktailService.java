@@ -3,8 +3,8 @@ package com.ridango.game.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ridango.game.Drink;
 import com.ridango.game.client.CocktailClient;
+import com.ridango.game.model.Drink;
 
 @Service
 public class CocktailService {

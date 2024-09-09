@@ -1,4 +1,4 @@
-package com.ridango.game;
+package com.ridango.game.model;
 
 public class CharToken {
     private char value;

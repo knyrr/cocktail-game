@@ -13,6 +13,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.ridango.game.entity.Score;
+import com.ridango.game.model.CharToken;
+import com.ridango.game.model.Drink;
 import com.ridango.game.service.CocktailService;
 import com.ridango.game.service.ScoreService;
 
@@ -113,7 +115,8 @@ public class CocktailGameApplication implements CommandLineRunner {
 			System.out.println("*Welcome to the game Guess the Cocktail!*");
 			System.out.println("*****************************************");
 			if (highestScore != null) {
-				System.out.println("Best barista in the game: " + highestScore.getName() + " / "
+				System.out.println("Best barista in the game: " + highestScore.getName() +
+						" / "
 						+ highestScore.getScore());
 			}
 
@@ -152,7 +155,8 @@ public class CocktailGameApplication implements CommandLineRunner {
 					tokenisedName = checkTokenVisibilty(tokenisedName, visibleCharacters);
 					coveredName = convertTokenisedNameToString(tokenisedName);
 
-					System.out.println("\nGuess the Cocktail. " + (round - i) + "attempts left. Score " + score);
+					System.out.println("\nGuess the Cocktail. " + (round - i) +
+							" attempts left. Score " + score);
 					System.out.println("Name: " + coveredName + "\n");
 					System.out.println("Spoiler: " + name + "\n");
 

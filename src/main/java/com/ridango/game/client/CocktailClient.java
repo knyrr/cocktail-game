@@ -1,8 +1,8 @@
 package com.ridango.game.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ridango.game.Drink;
-import com.ridango.game.DrinkResponse;
+import com.ridango.game.model.Drink;
+import com.ridango.game.model.DrinkResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,8 @@ public class CocktailClient {
     public Drink getCocktail() {
         try {
             String json = restTemplate.getForObject(apiUrl, String.class);
-            return processJson(json);
+            Drink drink = processJson(json);
+            return drink;
         } catch (HttpClientErrorException e) {
             e.printStackTrace();
             return null;
