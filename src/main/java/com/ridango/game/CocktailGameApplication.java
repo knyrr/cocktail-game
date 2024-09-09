@@ -86,11 +86,9 @@ public class CocktailGameApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		Scanner scanner = new Scanner(System.in).useDelimiter("\\n");
 
-		scoreService.saveScore(new Score("Alice", 90));
-		scoreService.saveScore(new Score("Mai", 110));
 		List<Score> allScores = scoreService.getAllScores();
-		Score highestScore = scoreService.getHighestScore();
 
+		Score highestScore;
 		Drink drink;
 		String name;
 		List<Character> uniqueCharsInName;
@@ -104,19 +102,22 @@ public class CocktailGameApplication implements CommandLineRunner {
 		Boolean continueGameSession;
 		Boolean continueGame = true;
 
-		System.out.println(allScores.toString());
-		System.out.println(highestScore.getScore());
-
 		// Game
 		while (continueGame) {
+
+			System.out.println(allScores.toString());
 			continueGameSession = true;
+			highestScore = scoreService.getHighestScore();
 
 			System.out.println();
 			System.out.println("*****************************************");
 			System.out.println("*Welcome to the game Guess the Cocktail!*");
 			System.out.println("*****************************************");
-			System.out.println("Best barista in the game: " + highestScore.getName() + " / "
-					+ highestScore.getScore());
+			if (highestScore != null) {
+				System.out.println("Best barista in the game: " + highestScore.getName() + " / "
+						+ highestScore.getScore());
+			}
+
 			System.out.println();
 
 			System.out.println("Please enter your name");
@@ -152,7 +153,7 @@ public class CocktailGameApplication implements CommandLineRunner {
 					tokenisedName = checkTokenVisibilty(tokenisedName, visibleCharacters);
 					coveredName = convertTokenisedNameToString(tokenisedName);
 
-					System.out.println("\nGuess the Cocktail. Attempts left " + (round - i) + ". Score " + score);
+					System.out.println("\nGuess the Cocktail. " + (round - i) + "attempts left. Score " + score);
 					System.out.println("Name: " + coveredName + "\n");
 					System.out.println("Spoiler: " + name + "\n");
 
@@ -212,7 +213,6 @@ public class CocktailGameApplication implements CommandLineRunner {
 			System.out.println("\nGame over!");
 			System.out.println("\nYour total score is: " + score);
 			scoreService.saveScore(new Score(player, score));
-
 		}
 
 		scanner.close();
