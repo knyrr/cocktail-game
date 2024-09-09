@@ -13,7 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.ridango.game.entity.Score;
-import com.ridango.game.model.CharToken;
+import com.ridango.game.model.CharacterToken;
 import com.ridango.game.model.Drink;
 import com.ridango.game.service.CocktailService;
 import com.ridango.game.service.ScoreService;
@@ -31,11 +31,11 @@ public class CocktailGameApplication implements CommandLineRunner {
 		SpringApplication.run(CocktailGameApplication.class, args);
 	}
 
-	private List<CharToken> tokeniseName(String input) {
-		List<CharToken> result = new ArrayList<CharToken>();
+	private List<CharacterToken> tokeniseName(String input) {
+		List<CharacterToken> result = new ArrayList<CharacterToken>();
 
 		for (int i = 0; i < input.length(); i++) {
-			CharToken token = new CharToken();
+			CharacterToken token = new CharacterToken();
 			char c = input.charAt(i);
 			token.setValue(c);
 			result.add(token);
@@ -43,8 +43,8 @@ public class CocktailGameApplication implements CommandLineRunner {
 		return result;
 	}
 
-	private List<CharToken> checkTokenVisibilty(List<CharToken> tokens, List<Character> visibleCharacters) {
-		for (CharToken token : tokens) {
+	private List<CharacterToken> checkTokenVisibilty(List<CharacterToken> tokens, List<Character> visibleCharacters) {
+		for (CharacterToken token : tokens) {
 			if (visibleCharacters.contains(token.getValue())) {
 				token.setIsHidden(false);
 			}
@@ -52,11 +52,11 @@ public class CocktailGameApplication implements CommandLineRunner {
 		return tokens;
 	}
 
-	private String convertTokenisedNameToString(List<CharToken> tokens) {
+	private String convertTokenisedNameToString(List<CharacterToken> tokens) {
 		StringBuilder result = new StringBuilder();
 
 		for (int i = 0; i < tokens.size(); i++) {
-			CharToken token = tokens.get(i);
+			CharacterToken token = tokens.get(i);
 			if (token.getIsHidden()) {
 				result.append('_');
 			} else {
@@ -96,12 +96,12 @@ public class CocktailGameApplication implements CommandLineRunner {
 		String name;
 		List<Character> uniqueCharsInName;
 		List<Character> visibleCharacters;
-		List<CharToken> tokenisedName;
+		List<CharacterToken> tokenisedName;
 		String coveredName;
 		int charactersToReveal;
 
 		int score = 0;
-		int round;
+		int attemps;
 		Boolean continueGameSession;
 		Boolean continueGame = true;
 
@@ -139,10 +139,10 @@ public class CocktailGameApplication implements CommandLineRunner {
 				tokenisedName = tokeniseName(name);
 				charactersToReveal = uniqueCharsInName.size() / 5;
 
-				round = 5;
+				attemps = 5;
 
 				// Game round
-				gameRound: for (int i = 0; i < round; i++) {
+				gameRound: for (int i = 0; i < attemps; i++) {
 					for (int j = 0; j < charactersToReveal; j++) {
 						Character randomUniqueCharacterInName = pickRandomCharacter(uniqueCharsInName);
 						if (i != 0 && randomUniqueCharacterInName != null
@@ -155,7 +155,7 @@ public class CocktailGameApplication implements CommandLineRunner {
 					tokenisedName = checkTokenVisibilty(tokenisedName, visibleCharacters);
 					coveredName = convertTokenisedNameToString(tokenisedName);
 
-					System.out.println("\nGuess the Cocktail. " + (round - i) +
+					System.out.println("\nGuess the Cocktail. " + (attemps - i) +
 							" attempts left. Score " + score);
 					System.out.println("Name: " + coveredName + "\n");
 					System.out.println("Spoiler: " + name + "\n");
@@ -190,9 +190,9 @@ public class CocktailGameApplication implements CommandLineRunner {
 							System.out.println("Enter your guess");
 							String guess = scanner.next().trim();
 							if (guess.equals(name)) {
-								score += round - i;
+								score += attemps - i;
 								System.out.println(
-										"\nSuccess! You got " + (round - i) + " points and your total score is "
+										"\nSuccess! You got " + (attemps - i) + " points and your total score is "
 												+ score + " points\n");
 								System.out.println("Do you want continue? y/n \n");
 								char c = scanner.next().charAt(0);

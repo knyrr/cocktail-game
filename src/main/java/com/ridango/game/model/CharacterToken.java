@@ -1,6 +1,6 @@
 package com.ridango.game.model;
 
-public class CharToken {
+public class CharacterToken {
     private char value;
     private Boolean isHidden = true;
 
