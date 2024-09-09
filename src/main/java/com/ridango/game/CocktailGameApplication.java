@@ -12,16 +12,18 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.ridango.game.client.CocktailApiClient;
 import com.ridango.game.entity.Score;
+import com.ridango.game.service.CocktailService;
 import com.ridango.game.service.ScoreService;
 
 @SpringBootApplication
 public class CocktailGameApplication implements CommandLineRunner {
-	CocktailApiClient drinkClient = new CocktailApiClient();
 
 	@Autowired
 	private ScoreService scoreService;
+
+	@Autowired
+	private CocktailService cocktailService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CocktailGameApplication.class, args);
@@ -126,7 +128,7 @@ public class CocktailGameApplication implements CommandLineRunner {
 
 			// Game session
 			while (continueGameSession) {
-				drink = drinkClient.fetchRandomCocktail();
+				drink = cocktailService.getCocktail();
 				name = drink.getName();
 				uniqueCharsInName = extractUniqueCharacters(name);
 				visibleCharacters = new ArrayList<Character>();
