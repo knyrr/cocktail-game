@@ -1,7 +1,5 @@
 package com.ridango.game.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,16 +28,8 @@ public class ScoreService {
         }
     }
 
-    public List<Score> getAllScores() {
-        return scoreRepository.findAll();
-    }
-
     public Score saveScore(Score score) {
         return scoreRepository.save(score);
     }
-
-    void deleteScore(Long id) {
-        scoreRepository.deleteById(id);
-    };
 
 }

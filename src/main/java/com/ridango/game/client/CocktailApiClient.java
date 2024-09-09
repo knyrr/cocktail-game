@@ -1,21 +1,25 @@
-package com.ridango.game;
+package com.ridango.game.client;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ridango.game.Drink;
+import com.ridango.game.DrinkDeserializer;
+import com.ridango.game.DrinkResponse;
 
-@RestController
-public class CocktailGameController {
+public class CocktailApiClient {
 
-    private static final String COCKTAIL_API_URL = "https://www.thecocktaildb.com/api/json/v1/1/random.php";
+    private static final String API_URL = "https://www.thecocktaildb.com/api/json/v1/1/random.php";
 
-    @GetMapping("/getCocktail")
-    public Drink getCocktail() {
-        RestTemplate restTemplate = new RestTemplate();
-        String json = restTemplate.getForObject(COCKTAIL_API_URL, String.class);
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public Drink fetchRandomCocktail() {
+        String json = restTemplate.getForObject(API_URL, String.class);
+        return processJson(json);
+    }
+
+    private Drink processJson(String json) {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Drink.class, new DrinkDeserializer())
                 .create();

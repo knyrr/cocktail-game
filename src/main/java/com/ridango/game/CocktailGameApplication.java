@@ -12,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.ridango.game.client.CocktailApiClient;
 import com.ridango.game.entity.Score;
 import com.ridango.game.service.ScoreService;
 
@@ -86,8 +87,6 @@ public class CocktailGameApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		Scanner scanner = new Scanner(System.in).useDelimiter("\\n");
 
-		List<Score> allScores = scoreService.getAllScores();
-
 		Score highestScore;
 		Drink drink;
 		String name;
@@ -104,8 +103,6 @@ public class CocktailGameApplication implements CommandLineRunner {
 
 		// Game
 		while (continueGame) {
-
-			System.out.println(allScores.toString());
 			continueGameSession = true;
 			highestScore = scoreService.getHighestScore();
 
