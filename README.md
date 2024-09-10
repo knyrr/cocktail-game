@@ -1,21 +1,56 @@
-# Cocktail game
+# Guess the Cocktail
 
-- A simple game of guess the cocktail using public API https://www.thecocktaildb.com/api.php
+- A simple and interactive console game where players guess the names of cocktails based on hints and partially revealed names. Players earn points for correct guesses and receive hints to help them along the way.
 
-## Game rules:
+## Features
 
-- Random cocktail with instructions is shown to the player together with number of letters in the name of the cocktail (e.g. "Mojito" -> "\_ \_ \_ \_ \_ \_")
-- Player must guess the name of the cocktail
-- Player can skip the round if he doesn't know the answer to get more hints about the cocktail
-- Player has 5 attempts to guess the name of the cocktail
-- If player answers correctly the game continues with a new random cocktail and score is increased by number of attempts left
-- If player answers wrongly or skips round the game shows:
-  - Name of the cocktail with some new random letters revealed (e.g. "\_ \_ \_ \_ \_ _" -> " _ _ j _ \_ _" -> " _ _ j _ _ o" -> "M _ j \_ _ o" -> "M _ ji _ o" -> "M _ jito" -> "Mojito") (For longer cocktails more letters can be revealed than one)
-  - Additional info about the cocktail (e.g. category, glass, ingredients, picture)
-  - Number of attempts left
-- If player fails to guess the cocktail after 5 attempts the game ends and high score is updated
-- In one game same cocktail shouldn't appear twice
- 
+- Guess the cocktail name based on partially revealed characters.
+- Receive hints related to the cocktail (instructions, category, glass, ingredients, and image).
+- Highest scores are saved.
+
+## Technologies
+
+- **Spring Boot**: Provides the foundation for building the web application.
+- **Java**: The application is developed using Java 17.
+- **H2 Database**: An simple database used for development and testing with an in-memory or in-file option.
+- **Lombok**: A library that helps reduce boilerplate code in Java.
+- **Jackson**: Used for JSON processing.
+- **JUnit**: Testing framework used for unit tests.
+
+## Installation and Setup
+
+### Prerequisites
+
+- Java 17
+- Gradle
+
+### Steps
+
+1. Clone the repository:
+
+   ```bash
+   git clone git@github.com:knyrr/cocktail-game.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd cocktail-game
+   ```
+
+3. Build the project using Gradle:
+
+   ```bash
+   ./gradlew build
+   ```
+
+4. Run the application:
+   ```bash
+   java -jar build/libs/cocktail-game-0.0.1-SNAPSHOT.jar
+   ```
+
+## Screeshot
+
 | ![cocktail-game](https://github.com/user-attachments/assets/18a5910b-06cf-4271-ae07-5ed8d33bb1f3) |
-|:--:|
-| *Guess the Cocktail console screenshot* |
+| :-----------------------------------------------------------------------------------------------: |
+|                              _Guess the Cocktail console screenshot_                              |
