@@ -49,7 +49,7 @@
    java -jar build/libs/cocktail-game-0.0.1-SNAPSHOT.jar
    ```
 
-## Screeshot
+## Screenshot
 
 | ![cocktail-game](https://github.com/user-attachments/assets/18a5910b-06cf-4271-ae07-5ed8d33bb1f3) |
 | :-----------------------------------------------------------------------------------------------: |
