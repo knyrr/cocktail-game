@@ -30,8 +30,12 @@ public class CocktailClient {
     public Drink getCocktail() {
         try {
             String json = restTemplate.getForObject(apiUrl, String.class);
-            Drink drink = processJson(json);
-            return drink;
+
+            if (json == null) {
+                return null;
+            }
+
+            return processJson(json);
         } catch (HttpClientErrorException e) {
             e.printStackTrace();
             return null;

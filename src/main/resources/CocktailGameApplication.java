@@ -9,5 +9,3 @@ public class CocktailGameApplication {
 		SpringApplication.run(CocktailGameApplication.class, args);
 	}
 }
-
-// Kontrollida, et kokteili varem pole
