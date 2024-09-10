@@ -9,6 +9,8 @@ import com.ridango.game.util.TokenUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -18,6 +20,9 @@ import java.util.Scanner;
 
 @Component
 public class GameController implements CommandLineRunner {
+
+    @Autowired
+    private ApplicationContext context;
 
     @Autowired
     private ScoreService scoreService;
@@ -197,7 +202,32 @@ public class GameController implements CommandLineRunner {
             } else {
                 System.out.println("\nGame over! Your total score is " + score);
             }
+
+            // End of game menu, which accepts only numbers 1-2
+            System.out.println("\nMenu: 1 - new game; 2 - close game");
+            int endMenuChoice = scanner.next().charAt(0) - '0';
+            List<Integer> validChoices = Arrays.asList(1, 2);
+
+            while (!validChoices.contains(endMenuChoice)) {
+                System.out.println("Enter 1-2");
+                System.out.println("Menu: 1 - new game; 2 - close game");
+                endMenuChoice = scanner.next().charAt(0) - '0';
+            }
+
+            switch (endMenuChoice) {
+                // The player chose to continue the name
+                case 1:
+                    break;
+                case 2:
+                    continueGame = false;
+                    break;
+                default:
+                    break;
+            }
+
         }
         scanner.close();
+        int exitCode = SpringApplication.exit(context, () -> 0);
+        System.exit(exitCode);
     }
 }
