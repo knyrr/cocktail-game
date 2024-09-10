@@ -1,10 +1,10 @@
-## Cocktail game\* Java 1.17 or newer
+# Cocktail game
 
 - A simple game of guess the cocktail using public API https://www.thecocktaildb.com/api.php
 
-# Game rules:
+## Game rules:
 
-- Random cocktail with instructions is shown to the player together with number of letter in the name of the cocktail (e.g. "Mojito" -> "\_ \_ \_ \_ \_ \_")
+- Random cocktail with instructions is shown to the player together with number of letters in the name of the cocktail (e.g. "Mojito" -> "\_ \_ \_ \_ \_ \_")
 - Player must guess the name of the cocktail
 - Player can skip the round if he doesn't know the answer to get more hints about the cocktail
 - Player has 5 attempts to guess the name of the cocktail
@@ -15,10 +15,7 @@
   - Number of attempts left
 - If player fails to guess the cocktail after 5 attempts the game ends and high score is updated
 - In one game same cocktail shouldn't appear twice
-
-* Main tasks:
-
-  - Build a Java console application using Java 1.8 or newer (we recommend using Java 17 or 21) which allows to play a game of "Guess the cocktail"
-  - Build a game with the rules from above
-  - Remember the current highest score achieved
-  - Feel free to add any more functionalities you think would be cool to add
+ 
+| ![cocktail-game](https://github.com/user-attachments/assets/18a5910b-06cf-4271-ae07-5ed8d33bb1f3) |
+|:--:|
+| *Guess the Cocktail console screenshot* |
