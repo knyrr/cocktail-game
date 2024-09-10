@@ -44,7 +44,6 @@ public class CocktailServiceTest {
         assertEquals("12345", result.getId());
         assertEquals("Margarita", result.getName());
 
-        // Verify that the method was called on the mock
         verify(cocktailClient).getCocktail();
     }
 }

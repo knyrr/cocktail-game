@@ -29,12 +29,15 @@ public class GameController implements CommandLineRunner {
     public void run(String... args) {
         Scanner scanner = new Scanner(System.in).useDelimiter("\\n");
         int score = 0;
+        List<String> drinksUsedInSession = new ArrayList<>();
         boolean continueGame = true;
 
+        // After every session the game restarts
         while (continueGame) {
-            System.out.println("\n*****************************************");
-            System.out.println("*Welcome to the game Guess the Cocktail!*");
-            System.out.println("*****************************************");
+            drinksUsedInSession.clear();
+            System.out.println("\n********************************");
+            System.out.println("*Welcome to Guess the Cocktail!*");
+            System.out.println("********************************");
 
             Score highestScore = scoreService.getHighestScore();
             if (highestScore != null) {
@@ -47,17 +50,39 @@ public class GameController implements CommandLineRunner {
             String player = scanner.next();
 
             boolean continueGameSession = true;
+
+            // Game session lasts until the player fails to guess the cocktail or exits
             while (continueGameSession) {
                 Drink drink = cocktailService.getCocktail();
+                String id = drink.getId();
+
+                // Checks if the drink used during the session is unique and has not been used
+                // previously in the same session
+                while (drinksUsedInSession.contains(id)) {
+                    drink = cocktailService.getCocktail();
+                    id = drink.getId();
+                }
+                drinksUsedInSession.add(id);
                 String name = drink.getName();
+
+                // Converts the name into character tokens that store character's value
+                // and if they are hidden or not. Also sets which characters should be shown
+                // first off
                 List<CharacterToken> tokenisedName = TokenUtils.tokeniseName(name);
                 List<Character> uniqueCharsInName = TokenUtils.extractUniqueCharacters(name);
                 List<Character> visibleCharacters = new ArrayList<>(List.of(' ', '\'', '-', '#', '&'));
+                uniqueCharsInName.removeAll(visibleCharacters);
                 int charactersToReveal = uniqueCharsInName.size() / 5;
                 int attempts = 5;
 
-                // Game round
+                // Game round with 5 attempts
                 gameRound: for (int i = 0; i < attempts; i++) {
+
+                    // Randomly chooses which charecters to reveal
+                    // The amount of characters to be revealed in one attempt depends on the amount
+                    // of unique characters in the name
+                    // Skips first attempt so that all characters except special characters are
+                    // hidden
                     for (int j = 0; j < charactersToReveal; j++) {
                         Character randomUniqueCharacterInName = TokenUtils.pickRandomCharacter(uniqueCharsInName);
                         if (i != 0 && randomUniqueCharacterInName != null
@@ -67,6 +92,7 @@ public class GameController implements CommandLineRunner {
                         }
                     }
 
+                    // Applies the mask on the tokenised name
                     tokenisedName = TokenUtils.checkTokenVisibility(tokenisedName, visibleCharacters);
                     String coveredName = TokenUtils.convertTokenisedNameToString(tokenisedName);
 
@@ -77,6 +103,7 @@ public class GameController implements CommandLineRunner {
                     System.out.println("Name: " + coveredName);
                     System.out.println("Spoiler: " + name);
 
+                    // Shows a hint according to the attemt level
                     System.out.println("\nHint " + (i + 1));
                     switch (i) {
                         case 0:
@@ -98,6 +125,7 @@ public class GameController implements CommandLineRunner {
                             break;
                     }
 
+                    // Shows the menu, which accepts only numbers 1-2-3
                     System.out.println("\nMenu: 1 - guess the drink; 2 - skip to see a hint; 3 - exit");
                     int menuChoice = scanner.next().charAt(0) - '0';
                     List<Integer> validChoices = Arrays.asList(1, 2, 3);
@@ -110,10 +138,13 @@ public class GameController implements CommandLineRunner {
 
                     boolean breakRound = false;
 
+                    // Game logic based on menu choice
                     switch (menuChoice) {
+                        // The player chose to guess the name
                         case 1:
                             System.out.println("Enter your guess");
                             String guess = scanner.next().trim();
+                            // The answer is correct (regardless of case differneces)
                             if (guess.equalsIgnoreCase(name)) {
                                 score += (attempts - i);
                                 System.out.println(
@@ -122,21 +153,30 @@ public class GameController implements CommandLineRunner {
                                                 + ((attempts - i) == 1 ? " point"
                                                         : " points")
                                                 + ". Total score: " + score);
+                                // Prompt to continue game or exit
                                 System.out.println("Do you want to continue? y/n");
                                 char c = scanner.next().charAt(0);
                                 if (c == 'n') {
                                     continueGameSession = false;
                                 }
                                 breakRound = true;
-                            } else {
-                                System.out.println("Oh no, wrong answer! On to next round");
+                            }
+                            // Wrong answer. Player gets to try again or if it is the last attempt, the
+                            // game ends
+                            else {
+                                System.out.println("Oh no, wrong answer!");
+                                if (i == 4) {
+                                    continueGameSession = false;
+                                }
                             }
                             break;
+                        // Player chose to see a new hint. If it is the last attempt, the game ends
                         case 2:
                             if (i == 4) {
                                 continueGameSession = false;
                             }
                             break;
+                        // Player exits the game
                         case 3:
                             continueGameSession = false;
                             breakRound = true;
@@ -149,6 +189,8 @@ public class GameController implements CommandLineRunner {
                     }
                 }
             }
+
+            // End of game. Compares the player's score with the highest score
             if (highestScore == null || score > highestScore.getScore()) {
                 System.out.println("\nYou are the ultimate barista. " + score + " is the best score in town!");
                 scoreService.saveScore(new Score(player, score));
